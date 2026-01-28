@@ -90,7 +90,7 @@ function drawStartScreen() {
     ctx.fillText("Run From The Dog 🐕", 240, 120);
 
     ctx.font = "18px Arial";
-    ctx.fillText("Press SPACE to Start", 300, 170);
+    ctx.fillText("Press SPACE or TAP to Start", 260, 170);
 }
 
 function drawGround() {
@@ -132,8 +132,6 @@ function updatePlayer() {
 
 function updateDog() {
     const targetX = player.x - dog.distance;
-
-    // smooth follow
     dog.x += (targetX - dog.x) * 0.05;
 
     if (checkCollision(player, dog) && !gameOver) {
@@ -191,28 +189,37 @@ function drawGameOver() {
 
     ctx.font = "20px Arial";
     ctx.fillText("Final Score: " + score, 310, 180);
-    ctx.fillText("Press SPACE to Restart", 270, 220);
+    ctx.fillText("Press SPACE or TAP to Restart", 230, 220);
 }
 
-// ========= CONTROLS =========
+// ========= CONTROLS (KEYBOARD) =========
 document.addEventListener("keydown", e => {
     if (e.code === "Space") {
-
-        if (!gameStarted) {
-            gameStarted = true;
-            return;
-        }
-
-        if (!gameOver && player.onGround) {
-            player.velocityY = player.jumpPower;
-            player.onGround = false;
-            jumpSound.currentTime = 0;
-            jumpSound.play();
-        } else if (gameOver) {
-            restartGame();
-        }
+        handleInput();
     }
 });
+
+// ========= CONTROLS (MOBILE / CLICK) =========
+canvas.addEventListener("click", () => {
+    handleInput();
+});
+
+// ========= SHARED INPUT LOGIC =========
+function handleInput() {
+    if (!gameStarted) {
+        gameStarted = true;
+        return;
+    }
+
+    if (!gameOver && player.onGround) {
+        player.velocityY = player.jumpPower;
+        player.onGround = false;
+        jumpSound.currentTime = 0;
+        jumpSound.play();
+    } else if (gameOver) {
+        restartGame();
+    }
+}
 
 // ========= BACKGROUND =========
 function drawBackground() {
@@ -231,11 +238,11 @@ function drawBackground() {
 function restartGame() {
     obstacles = [];
     score = 0;
-    dog.distance = 220; // FIXED
+    dog.distance = 220;
     gameSpeed = 5;
     gameOver = false;
     gameStarted = false;
-    bgX = 0;            // FIXED
+    bgX = 0;
     gameLoop();
 }
 
